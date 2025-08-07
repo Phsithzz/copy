@@ -105,7 +105,7 @@ export const getProductById = async (req, res) => {
 
 export const putProduct = async (req, res) => {
   console.log(`PUT /products is requestd`);
-  console.log("req.body:", req.body)
+  console.log("req.body:", req.body);
   try {
     const bodyData = req.body;
     const result = await database.query({
@@ -136,7 +136,6 @@ export const putProduct = async (req, res) => {
     bodyData.updateData = datetime;
     bodyData.message = "ok";
     return res.status(201).json(bodyData);
-
   } catch (err) {
     console.log(err);
     res.status(500).json({
@@ -145,24 +144,47 @@ export const putProduct = async (req, res) => {
   }
 };
 
-export const deleteProduct = async (req,res) =>{
-  console.log(`DELETE /products ${req.params.id} is requested`)
+export const deleteProduct = async (req, res) => {
+  console.log(`DELETE /products ${req.params.id} is requested`);
   try {
-    const bodyData = req.body
+    const bodyData = req.body;
     const result = await database.query({
-      text:`DELETE FROM "products"
+      text: `DELETE FROM "products"
             WHERE "pdId" = $1`,
-      values : [req.params.id]
-    })
-    if(result.rowCount == 0){
-      return res.status(404).json({message:`Error id ${req.params.id} not Found`})
+      values: [req.params.id],
+    });
+    if (result.rowCount == 0) {
+      return res
+        .status(404)
+        .json({ message: `Error id ${req.params.id} not Found` });
     }
-    return res.status(201).end()
+    return res.status(201).end();
   } catch (err) {
-    console.log(err)
+    console.log(err);
     res.status(500).json({
-      message:err.message
-    })
-    
+      message: err.message,
+    });
   }
-}
+};
+
+export const getProductByBrandId = async (req, res) => {
+  try {
+    const result = await database.query({
+      text: ` SELECT p.* ,
+                      
+                      (
+                        SELECT row_to_json(pdt_obj)
+                        FROM ( SELECT "pdTypeId","pdTypeName"
+                              FROM "pdTypes"	
+                              WHERE "pdTypeId"=p."pdTypeId" )pdt_obj
+                      )AS pdt
+                      FROM products p 
+                      WHERE p."brandId" ILIKE $1 `,
+      values: [req.params.id],
+    });
+    return res.status(200).json(result.rows);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: err.message });
+  }
+};
