@@ -5,6 +5,6 @@ const router = express.Router()
 router.get('/products',productController.getAllProduct)
 router.post('/products',productController.postProduct)
 router.get('/products/:id',productController.getProductById)
-
+router.put('/products/:id',productController.putProduct)
 
 export default router

@@ -103,3 +103,44 @@ export const getProductById = async (req, res) => {
   }
 };
 
+export const putProduct = async (req, res) => {
+  console.log(`PUT /products is requestd`);
+  console.log("req.body:", req.body)
+  try {
+    const bodyData = req.body;
+    const result = await database.query({
+      text: `UPDATE "products"
+      SET "pdName" = $1,
+          "pdPrice" = $2,
+          "pdRemark" = $3,
+          "pdTypeId" = $4,
+          "brandId" = $5
+      WHERE "pdId" = $6 `,
+      values: [
+        bodyData.pdName,
+        bodyData.pdPrice,
+        bodyData.pdRemark,
+        bodyData.pdTypeId,
+        bodyData.brandId,
+        req.params.id,
+      ],
+    });
+
+    if (result.rowCount == 0) {
+      return res
+        .status(404)
+        .json({ message: `Error id ${req.params.id} not Found` });
+    }
+
+    const datetime = new Date();
+    bodyData.updateData = datetime;
+    bodyData.message = "ok";
+    return res.status(201).json(bodyData);
+
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: err.message,
+    });
+  }
+};
