@@ -6,5 +6,6 @@ router.get('/products',productController.getAllProduct)
 router.post('/products',productController.postProduct)
 router.get('/products/:id',productController.getProductById)
 router.put('/products/:id',productController.putProduct)
+router.delete('/products/:id',productController.deleteProduct)
 
 export default router

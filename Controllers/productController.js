@@ -144,3 +144,25 @@ export const putProduct = async (req, res) => {
     });
   }
 };
+
+export const deleteProduct = async (req,res) =>{
+  console.log(`DELETE /products ${req.params.id} is requested`)
+  try {
+    const bodyData = req.body
+    const result = await database.query({
+      text:`DELETE FROM "products"
+            WHERE "pdId" = $1`,
+      values : [req.params.id]
+    })
+    if(result.rowCount == 0){
+      return res.status(404).json({message:`Error id ${req.params.id} not Found`})
+    }
+    return res.status(201).end()
+  } catch (err) {
+    console.log(err)
+    res.status(500).json({
+      message:err.message
+    })
+    
+  }
+}
